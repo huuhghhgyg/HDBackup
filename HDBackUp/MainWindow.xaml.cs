@@ -29,7 +29,7 @@ namespace HDBackUp
 
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            if (Directory.Exists(pathIn.Text)||File.Exists(pathIn.Text))
+            if (Directory.Exists(pathIn.Text) || File.Exists(pathIn.Text))
             {
                 pathList.Items.Add(pathIn.Text);
             }
@@ -49,7 +49,7 @@ namespace HDBackUp
             //backupName.Content=pathList.SelectedItem.ToString();
             //backupFile();
             showState.Text = "正在备份";
-            
+
             Thread cp = new Thread(new ThreadStart(backupFile));
             cp.Start();
         }
@@ -85,14 +85,14 @@ namespace HDBackUp
             {
                 //Dispatcher.Invoke(new Action(delegate
                 //{
-                    CopyDirectory(each.ToString(), dir);
+                CopyDirectory(each.ToString(), dir);
                 //}));
             }
         }
 
         public int GetFilesCount(string path)
         {
-            int count=0;
+            int count = 0;
             //如果嵌套文件夹很多，可以开子线程去统计
             count += Directory.GetFiles(path).Length;
             foreach (var folder in Directory.GetDirectories(path))
@@ -102,7 +102,7 @@ namespace HDBackUp
             return count;
         }
 
-        int cped=0;
+        int cped = 0;
         private void CopyDirectory(string fromdir, string todir)
         {
             string folderName = fromdir.Substring(fromdir.LastIndexOf("\\") + 1);
@@ -155,11 +155,12 @@ namespace HDBackUp
                     cped++;
                     Dispatcher.Invoke(new Action(delegate
                     {
+                        cpProg.Value = cped;
+
                         if (cpProg.Value == cpProg.Maximum)
                         {
                             showState.Text = "备份完成";
                         }
-                        cpProg.Value = cped;
                         backuppath.Content = srcfileName;
                         backupName.Content = file;
                         backupNum.Content = (cped + "/" + fileNum);
@@ -177,9 +178,90 @@ namespace HDBackUp
                         }
                         catch { }
                     }
-                    
+
                 }
             }//foreach 
         }//function end 
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            //Thread load = new Thread(new ThreadStart(loadSettings));
+            //oad.Start();
+        }
+
+        private void saveSettings()
+        {
+            string output = "";
+            Dispatcher.Invoke(new Action(delegate
+            {
+                output += toDir.Text + "\n";
+            }));
+            if (!File.Exists("./path.txt"))
+            {
+                foreach (object each in pathList.Items)
+                {
+                    output += each.ToString() + "\n";
+                }
+                string[] lines = { output };
+                File.WriteAllLines(@"./path.txt", lines, Encoding.UTF8);
+            }
+            else
+            {
+                File.Delete(@"./path.txt");
+                loadSettings();
+            }
+        }
+
+        string read = "";
+        private void loadSettings()
+        {
+            if (File.Exists(@"./path.txt"))
+            {
+                StreamReader sr = new StreamReader(@"./path.txt", false);
+                read = sr.ReadLine().ToString();
+                Dispatcher.Invoke(new Action(delegate
+                {
+                    toDir.Text = read;
+                }));
+                read = sr.ReadLine().ToString();
+                bool ised = false;
+                try
+                {
+                    while (null != read&&read!="")
+                    {
+                        ised = false;
+                        Dispatcher.Invoke(new Action(delegate
+                        {
+                            foreach(object each in pathList.Items)
+                            {
+                                if (each.ToString() == read)
+                                {
+                                    ised = true;
+                                    break;
+                                }
+                            }
+                            if (ised != true)
+                            {
+                                pathList.Items.Add(read);
+                            }
+                        }));
+                        read = sr.ReadLine().ToString();
+                    }
+                }
+                catch { }
+                sr.Close();
+            }
+        }
+
+        private void saveBtn_Click(object sender, RoutedEventArgs e)
+        {
+            saveSettings();
+        }
+
+        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        {
+            Thread load = new Thread(new ThreadStart(loadSettings));
+            load.Start();
+        }
     }
 }
