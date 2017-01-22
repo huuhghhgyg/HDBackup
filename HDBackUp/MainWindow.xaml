@@ -25,12 +25,12 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Path" VerticalAlignment="Top" FontSize="20"/>
                     <ListBox x:Name="pathList" Margin="10,40,10.333,99.333"/>
-                    <TextBox x:Name="pathIn" Height="23" Margin="10,0,89.333,71.333" TextWrapping="Wrap" Text="D:\CalCore" VerticalAlignment="Bottom"/>
+                    <TextBox x:Name="pathIn" Height="23" Margin="10,0,89.333,71.333" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
                     <Button x:Name="Add" Content="Add" HorizontalAlignment="Right" Margin="0,0,50.333,71.333" VerticalAlignment="Bottom" Width="40" Height="23" Click="Add_Click"/>
                     <CheckBox x:Name="openBk" Content="开启程序时备份" HorizontalAlignment="Right" Margin="0,178,13.333,0" VerticalAlignment="Top"/>
                     <Button x:Name="saveBtn" Content="Save" HorizontalAlignment="Right" Margin="0,0,13.333,10.333" VerticalAlignment="Bottom" Width="77" Height="20" Click="saveBtn_Click"/>
                     <Button x:Name="Delete" Content="Del" HorizontalAlignment="Right" Margin="0,0,10.333,71.333" VerticalAlignment="Bottom" Width="40" Height="23" Click="Delete_Click"/>
-                    <TextBox x:Name="toDir" Height="23" Margin="79,173,121.333,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="G:\"/>
+                    <TextBox x:Name="toDir" Height="23" Margin="79,173,121.333,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
                     <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,175,0,0" TextWrapping="Wrap" Text="Directory" VerticalAlignment="Top" Height="21" Width="69" FontSize="13.333"/>
                 </Grid>
             </TabItem>
