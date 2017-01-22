@@ -48,16 +48,19 @@ namespace HDBackUp
         {
             //backupName.Content=pathList.SelectedItem.ToString();
             //backupFile();
-            showState.Text = "正在备份";
 
             Thread cp = new Thread(new ThreadStart(backupFile));
             cp.Start();
         }
 
-        int backupNums;
+        int backupNums = 0;
         int fileNum = 0;
         private void backupFile()
         {
+            Dispatcher.Invoke(new Action(delegate
+            {
+                showState.Text = "正在备份";
+            }));
             cped = 0;
             /*int dirNum = pathList.Items.Count;
             backupName.Content = dirNum.ToString();
@@ -169,7 +172,7 @@ namespace HDBackUp
                     {
                         File.Copy(file, srcfileName);
                     }
-                    catch (System.IO.IOException)
+                    catch (IOException)
                     {
                         try//important
                         {
@@ -194,6 +197,7 @@ namespace HDBackUp
             string output = "";
             Dispatcher.Invoke(new Action(delegate
             {
+                output += autoBK.IsChecked.ToString()+"\n";
                 output += toDir.Text + "\n";
             }));
             if (!File.Exists("./path.txt"))
@@ -218,6 +222,12 @@ namespace HDBackUp
             if (File.Exists(@"./path.txt"))
             {
                 StreamReader sr = new StreamReader(@"./path.txt", false);
+                read = sr.ReadLine().ToString();
+                Dispatcher.Invoke(new Action(delegate
+                {
+                    autoBK.IsChecked = bool.Parse(read);
+                }));
+
                 read = sr.ReadLine().ToString();
                 Dispatcher.Invoke(new Action(delegate
                 {
@@ -250,6 +260,17 @@ namespace HDBackUp
                 }
                 catch { }
                 sr.Close();
+                Dispatcher.Invoke(new Action(delegate
+                {
+                    isauto = (bool)autoBK.IsChecked;
+                }));
+
+                if (isauto == true && autoed == false)
+                {
+                    autoed = true;
+                    Thread cp = new Thread(new ThreadStart(backupFile));
+                    cp.Start();
+                }
             }
         }
 
@@ -258,7 +279,9 @@ namespace HDBackUp
             saveSettings();
         }
 
-        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        bool autoed = false;
+        bool isauto =false;
+        private void showState_Loaded(object sender, RoutedEventArgs e)
         {
             Thread load = new Thread(new ThreadStart(loadSettings));
             load.Start();
