@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,7 +22,7 @@ namespace HDBackUp
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         public MainWindow()
         {
@@ -62,6 +64,7 @@ namespace HDBackUp
                 showState.Text = "正在备份";
             }));
             cped = 0;
+            errorNum = 0;
             /*int dirNum = pathList.Items.Count;
             backupName.Content = dirNum.ToString();
             backupNums = 0;
@@ -106,6 +109,7 @@ namespace HDBackUp
         }
 
         int cped = 0;
+        int errorNum = 0;
         private void CopyDirectory(string fromdir, string todir)
         {
             string folderName = fromdir.Substring(fromdir.LastIndexOf("\\") + 1);
@@ -126,7 +130,19 @@ namespace HDBackUp
                     string currentdir = desfolderdir + "\\" + file.Substring(file.LastIndexOf("\\") + 1);
                     if (!Directory.Exists(currentdir))
                     {
-                        Directory.CreateDirectory(currentdir);
+                        try
+                        {
+                            Directory.CreateDirectory(currentdir);
+                        }
+                        catch (DirectoryNotFoundException)
+                        {
+                            Dispatcher.Invoke(new Action(delegate
+                            {
+                                autoBK.IsChecked = false;
+                                saveSettings();
+                            }));
+                            Environment.Exit(0);
+                        }
                     }
 
                     Dispatcher.Invoke(new Action(delegate
@@ -179,7 +195,14 @@ namespace HDBackUp
                             File.Delete(srcfileName);
                             File.Copy(file, srcfileName);
                         }
-                        catch { }
+                        catch
+                        {
+                            errorNum++;
+                            Dispatcher.Invoke(new Action(delegate
+                            {
+                                ErrorNum.Content = "ErrorFileNumber:" + errorNum.ToString();
+                            }));
+                        }
                     }
 
                 }
@@ -285,6 +308,18 @@ namespace HDBackUp
         {
             Thread load = new Thread(new ThreadStart(loadSettings));
             load.Start();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if(flyout_settings.IsOpen == false)
+            {
+                flyout_settings.IsOpen = true;
+            }
+            else
+            {
+                flyout_settings.IsOpen = false;
+            }
         }
     }
 }
